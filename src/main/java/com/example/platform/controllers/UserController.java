@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,11 +35,20 @@ public class UserController {
         return new ResponseEntity<>(user.getId(), HttpStatus.OK);
     }
 
+    @GetMapping("/getUsers")
+    public ResponseEntity<Object> getUsers() {
+        List<UsersModel> users = usersRepository.findAll();
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
     @GetMapping("/login/{id}/{name}/{password}")
     public ResponseEntity<Object> login( @PathVariable("id") UUID id, @PathVariable("name") String name, @PathVariable("password") String password ) {
-        UsersModel user = usersRepository.getReferenceById(id);
+        System.out.println(id);
+        UsersModel user = usersRepository.findById(id).get();
+        System.out.print(user.getName());
+                System.out.println(name);
         if (user.getName().equals(name) && user.getPassword().equals(password)) {
-            return new ResponseEntity<>(true, HttpStatus.OK);
+            return new ResponseEntity<>(user, HttpStatus.OK);
         }
         return new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
     }

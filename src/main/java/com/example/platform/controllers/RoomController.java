@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.*;
 
+import static java.lang.Math.min;
+
 @RestController
 @RequestMapping("/api/room")
 @RequiredArgsConstructor
@@ -26,19 +28,31 @@ public class RoomController {
     @Autowired
     private final QuestionRepository questionRepository;
 
-    @PostMapping("/createRoom/{name}/{timer}/{level}/")
-    public ResponseEntity<Object> createRoom(@PathVariable("name") String name,@PathVariable("timer") Date timer, @PathVariable("level") String level) {
+    @PostMapping("/createRoom/{name}/{timer}/{level}")
+    public ResponseEntity<Object> createRoom(@PathVariable("name") String name,@PathVariable("timer") int timer, @PathVariable("level") String level) {
         List<QuestionModel> questions = questionRepository.findAll();
         RoomModel roomModel = new RoomModel();
         roomModel.setName(name);
         roomModel.setLevel(level);
-        roomModel.setTimer(timer);
+        // Create a Date instance representing the current date and time
+        Date date = new Date();
+
+        // Convert the Date to a Calendar
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+
+        // Add 60 minutes
+        calendar.add(Calendar.MINUTE, 60);
+
+        // Convert the Calendar back to a Date
+        Date updatedDate = calendar.getTime();
+        roomModel.setTimer(updatedDate);
         // pick only random 4
         ArrayList<UUID> addedQuestions = new ArrayList<>();
 
         Random random = new Random();
         int randomQuestions = 4;
-        for (int i = 0; i < randomQuestions; i++) {
+        for (int i = 0; i < min(randomQuestions, questions.size()); i++) {
             int indx = random.nextInt(questions.size());
             UUID qstn = questions.get(indx).getId();
             addedQuestions.add(qstn);
@@ -53,21 +67,29 @@ public class RoomController {
     // To join a room
     @PostMapping("/addUser/{roomId}/{userId}")
     public ResponseEntity<Object> addUser(@PathVariable("roomId") UUID roomId, @PathVariable("userId") UUID userId) {
-        RoomModel roomModel = roomRepository.findById(roomId).get();
-        ArrayList<UUID> users = roomModel.getUsers();
+        RoomModel roomModel = roomRepository.getReferenceById(roomId);
+        List<UUID> users = roomModel.getUsers();
         users.add(userId);
         roomModel.setUsers(users);
         roomRepository.save(roomModel);
-        return new ResponseEntity<>(roomModel, HttpStatus.OK);
+        return new ResponseEntity<>( HttpStatus.OK);
     }
+
 
     @PostMapping("/removeUser/{roomId}/{userId}")
     public ResponseEntity<Object> removeUser(@PathVariable("roomId") UUID roomId, @PathVariable("userId") UUID userId) {
         RoomModel roomModel = roomRepository.findById(roomId).get();
-        ArrayList<UUID> users = roomModel.getUsers();
+        List<UUID> users = roomModel.getUsers();
         users.remove(userId);
         roomModel.setUsers(users);
         roomRepository.save(roomModel);
-        return new ResponseEntity<>(roomModel, HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/getRooms")
+    public ResponseEntity<Object> getRooms() {
+        List<RoomModel> rooms = roomRepository.findAll();
+        return new ResponseEntity<>(rooms, HttpStatus.OK);
+    }
+
 }
