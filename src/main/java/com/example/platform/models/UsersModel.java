@@ -27,4 +27,5 @@ public class UsersModel {
 
     private int streak;
     private int rank;
+    private int status;
 }

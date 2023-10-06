@@ -1,5 +1,6 @@
 package com.example.platform.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,6 +12,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+@ToString
 @Builder
 @Table(name = "question")
 public class QuestionModel {
@@ -20,9 +23,8 @@ public class QuestionModel {
 
     private String title;
     private String description;
-    private String testCases;
+    private String parameters;
     private String expectedOutput;
     private String level;
-
-
+    private String functionTemplate;
 }

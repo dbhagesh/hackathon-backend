@@ -18,6 +18,7 @@ import java.util.UUID;
 @RequestMapping("/api/question")
 @RequiredArgsConstructor
 public class QuestionController {
+
     @Autowired
     private final UsersRepository usersRepository;
     @Autowired
@@ -28,5 +29,27 @@ public class QuestionController {
         List<QuestionModel> questions = questionRepository.findAll();
 
         return new ResponseEntity<>(questions, HttpStatus.OK);
+    }
+
+    @PostMapping("/createQuestions")
+    public ResponseEntity<QuestionModel> createQuestion() {
+
+        QuestionModel questionModel1 = new QuestionModel();
+        questionModel1.setTitle("Sorting");
+        questionModel1.setDescription("sort the array");
+        questionModel1.setParameters("[3, 2, 1], 3");
+        questionModel1.setExpectedOutput("[1, 2, 3]");
+        questionModel1.setLevel("easy");
+        questionRepository.save(questionModel1);
+
+        QuestionModel questionModel2 = new QuestionModel();
+        questionModel2.setTitle("Searching");
+        questionModel2.setDescription("search for an element in the array");
+        questionModel2.setParameters("[3, 2, 1], 3");
+        questionModel2.setExpectedOutput("true");
+        questionModel2.setLevel("medium");
+        questionRepository.save(questionModel2);
+
+        return new ResponseEntity<>(questionModel1, HttpStatus.OK);
     }
 }
