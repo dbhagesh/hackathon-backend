@@ -23,12 +23,17 @@ public class PythonCodeController {
     @Autowired
     private final QuestionRepository questionRepository;
 
-    @GetMapping("/executePython/{code}/{questionId}")
-    public ResponseEntity<Boolean> executePython(@PathVariable("code") String base64Code, @PathVariable("questionId") UUID qid) {
+    @GetMapping("/executePython/{code}/{questionId}/{userId}")
+    public ResponseEntity<Boolean> executePython(@PathVariable("code") String base64Code, @PathVariable("questionId") UUID qid,@PathVariable("userId") String userId) {
         QuestionModel questionModel = questionRepository.getReferenceById(qid);
 
+        String uid = userId;
+        String testcases = "";
+
         // testcase should be in this form "[4, 2, 3], 3"
-        String testcases = questionModel.getParameters();
+        if(questionModel.getParameters() != null) {
+            testcases = questionModel.getParameters();
+        }
         String expectedOutput = questionModel.getExpectedOutput();
 
         String decodedPythonCode = decodeBase64(base64Code);
@@ -36,7 +41,7 @@ public class PythonCodeController {
         decodedPythonCode += "\nprint(execute(" + testcases + "))";
 
         // Save the Python code to a file
-        String fileName = "dynamic_code" + System.currentTimeMillis() + ".py";
+        String fileName = "dynamic_code_" + qid + "_" +  uid + "_" + ".py";
         saveToFile(decodedPythonCode, fileName);
 
         // Execute the Python code and capture the output

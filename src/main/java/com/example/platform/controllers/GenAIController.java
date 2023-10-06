@@ -9,9 +9,15 @@ import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/gen-ai")
@@ -67,8 +73,8 @@ public class GenAIController {
     }
 
 
-    @GetMapping("/qualityFeedback")
-    public ResponseEntity<String> giveQualityFeedback(){
+    @GetMapping("/qualityFeedback/{base64}")
+    public ResponseEntity<String> giveQualityFeedback(@PathVariable String base64) {
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -85,7 +91,7 @@ public class GenAIController {
         headers.set("Cookie", "_t_ds=271160863224221-1695813206-1695813206-1695813206; _t_ds=365658480084201-1696480485-1696480485-1696480485");
 
         // Create the request body
-        String requestBody = "{\"prompt\":\"hello, how are you ?\",\"parameters\":{\"temperature\":1,\"maxOutputTokens\":250,\"topK\":1,\"topP\":0.5},\"model\":\"text-bison\"}";
+        String requestBody = "{\"prompt\":\"i will give you base64 code .firstly decode it in python \\\"" + base64 + "\\\" and give me optimised solution and also quality feedback of that python code in terms of time and space complexity\",\"parameters\":{\"temperature\":1,\"maxOutputTokens\":250,\"topK\":1,\"topP\":0.5},\"model\":\"text-bison\"}";
 
         // Create the HTTP entity with headers and body
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
