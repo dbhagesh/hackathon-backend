@@ -1,8 +1,10 @@
 package com.example.platform.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -10,29 +12,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "room")
-public class RoomModel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class RoomDTO {
     private UUID id;
-
     private String name;
     private String level;
     private Date timer;
-    @ElementCollection
-    @JsonIgnore()
     private List<UUID> questions;
-    @ElementCollection
-    @JsonIgnore()
     private List<UUID> users;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "roomModel")
-    private List<MessageModel> messages = new ArrayList<>();
-
+//    private List<MessageModel> messages = new ArrayList<>();
 }
