@@ -17,7 +17,11 @@ import org.springframework.web.client.RestTemplate;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.UUID;
+
+import static org.apache.tomcat.util.codec.binary.Base64.encodeBase64;
 
 @RestController
 @RequestMapping("/api/gen-ai")
@@ -161,6 +165,10 @@ public class GenAIController {
                 String cleanedJson = rawJson.substring(startIndex, endIndex + 1);
 
                 QuestionModel questionModel = gson.fromJson(cleanedJson,QuestionModel.class);
+
+                // Encode the string to Base64
+                String encodedString = Base64.getEncoder().encodeToString(questionModel.getFunctionTemplate().getBytes(StandardCharsets.UTF_8));
+                questionModel.setFunctionTemplate(encodedString);
 
                 QuestionModel saveModel = questionRepository.save(questionModel);
                 System.out.println("Deserialized Response: " + myResponse);
