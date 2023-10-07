@@ -24,11 +24,11 @@ public class RoomModel {
     private String name;
     private String level;
     private Date timer;
+
     @ElementCollection
-    @JsonIgnore()
     private List<UUID> questions;
+
     @ElementCollection
-    @JsonIgnore()
     private List<UUID> users;
 
     @OneToMany(cascade = CascadeType.ALL)

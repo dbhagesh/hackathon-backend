@@ -1,6 +1,7 @@
 package com.example.platform.controllers;
 
 import com.example.platform.models.QuestionModel;
+import com.example.platform.models.RoomDTO;
 import com.example.platform.models.RoomModel;
 import com.example.platform.models.UsersModel;
 import com.example.platform.repository.QuestionRepository;
@@ -27,6 +28,30 @@ public class RoomController {
     private final RoomRepository roomRepository;
     @Autowired
     private final QuestionRepository questionRepository;
+
+    @GetMapping("/getRoom/{id}")
+    public ResponseEntity<Object> getRoom(@PathVariable("id") UUID id) {
+        Optional<RoomModel> model = roomRepository.findById(id);
+
+        if(model.isPresent()) {
+            RoomModel rm = model.get();
+
+            ArrayList<UsersModel> users = new ArrayList<>();
+            for(UUID uId : rm.getUsers()) {
+                Optional<UsersModel> usr = usersRepository.findById(uId);
+                usr.ifPresent(users::add);
+            }
+
+            ArrayList<QuestionModel> questions = new ArrayList<>();
+            for(UUID qId : rm.getQuestions()) {
+                Optional<QuestionModel> q = questionRepository.findById(qId);
+                q.ifPresent(questions::add);
+            }
+            return ResponseEntity.ok().body(RoomDTO.builder().id(rm.getId()).name(rm.getName()).users(users).questions(questions).timer(rm.getTimer()).level(rm.getLevel()).build());
+        } else {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Not found!");
+        }
+    }
 
     @PostMapping("/createRoom/{name}/{timer}/{level}")
     public ResponseEntity<Object> createRoom(@PathVariable("name") String name,@PathVariable("timer") int timer, @PathVariable("level") String level) {
